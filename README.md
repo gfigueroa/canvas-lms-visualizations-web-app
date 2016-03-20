@@ -9,12 +9,12 @@ At the moment, we handle sign-in/registration using Google OAuth. You'd need Goo
 Alternatively, you could follow this [link](https://console.developers.google.com//start/api?id=gmail&credential=client_key) to enable the Gmail API - You'd need to sign in to Gmail first. Click "Go to credentials" and fill in the necessary forms. Click `Add credentials` -> `OAuth 2.0 client ID`. The rest should be easy. Save the `CLIENT_ID` & `CLIENT_SECRET` in the config_env.rb (See `config/config_env.rb.example`).
 
 This is a `Web application`. Authorized origins are of the form:
-- `http://localhost:9292`
-- `https://canvas-viz.herokuapp.com`
+- `http://localhost:9393`
+- `https://canvas-viz-app.herokuapp.com`
 
 And authorized redirect URIs take the form:
-- `http://localhost:9292/oauth2callback_gmail`
-- `https://canvas-viz.herokuapp.com/oauth2callback_gmail`
+- `http://localhost:9393/oauth2callback_gmail`
+- `https://canvas-viz-app.herokuapp.com/oauth2callback_gmail`
 
 ### config_env.rb
 
