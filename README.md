@@ -12,7 +12,7 @@ Alternatively, you could follow this [link](https://console.developers.google.co
 
 This is a `Web application`. Authorized origins are of the form:
 - `http://localhost:9393`
-- `http://localhost:9292`
+- `https://API_URL/`
 
 And authorized redirect URIs take the form:
 - `http://localhost:9393/oauth2callback_gmail`
