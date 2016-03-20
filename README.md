@@ -1,6 +1,6 @@
 # Canvas LMS Class Visualizations Web App
 
-This should be run in conjunction with the (API)[https://github.com/ISS-Analytics/canvas-lms-visualizations-api].
+This should be run in conjunction with the [API](https://github.com/ISS-Analytics/canvas-lms-visualizations-api).
 
 Feel free to clone the repo.
 
