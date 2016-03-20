@@ -1,4 +1,6 @@
-# Canvas LMS Class Visualizations
+# Canvas LMS Class Visualizations Web App
+
+This should be run in conjunction with the (API)[https://github.com/ISS-Analytics/canvas-lms-visualizations-api].
 
 Feel free to clone the repo.
 
@@ -10,11 +12,11 @@ Alternatively, you could follow this [link](https://console.developers.google.co
 
 This is a `Web application`. Authorized origins are of the form:
 - `http://localhost:9393`
-- `https://canvas-viz-app.herokuapp.com`
+- `http://localhost:9292`
 
 And authorized redirect URIs take the form:
 - `http://localhost:9393/oauth2callback_gmail`
-- `https://canvas-viz-app.herokuapp.com/oauth2callback_gmail`
+- `https://API_URL/oauth2callback_gmail`
 
 ### config_env.rb
 
