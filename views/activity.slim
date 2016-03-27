@@ -3,29 +3,9 @@
 include scripts
 script src='//code.highcharts.com/modules/exporting.js'
 h2 Course Participation
-- views = {}
-- data.each { |activity| views[activity['date']] = activity['views'] }
-- views = Hash[views.sort]
-- participations = Hash.new(0)
-- data.each { |activity| participations[activity['date']] = activity['participations'] }
-- participations = Hash[participations.sort]
-- v_p = [{name: 'Participations', data: participations}, {name: 'Views', data: views}]
-- views_participation = {}
-- data.each do |activity| \
-    views_participation[activity['date']] = [activity['views'], activity['participations']] \
-  end
-- views_participation_dow = Hash.new { |hash, key| hash[key] = [] }
-- views_participation.each do |date, _view_par| \
-    dow = Date.parse(date).strftime('%A'); \
-    views_participation_dow[dow] << views_participation[date]; \
-  end
-- views_by_day = {}
-- participations_by_day = {}
-- Date::DAYNAMES.each { |day| views_by_day[day] = 0; participations_by_day[day] = 0 }
-- views_participation_dow.each do |day, view_par| \
-    views_by_day[day] = views_participation_dow[day].map { |arr| arr[0] }.reduce(:+); \
-    participations_by_day[day] = views_participation_dow[day].map { |arr| arr[1] }.reduce(:+); \
-  end
+- views_by_day = data['views_by_day']
+- participations_by_day = data['participations_by_day']
+- v_p = data['v_p']
 div id='views-by-day'
 
 div align='center'
@@ -39,13 +19,6 @@ div id='column-chart-discrete'
   == line_chart v_p, discrete: true
 
 javascript:
-  var sunday = JSON.parse("#{views_participation_dow['Sunday']}");
-  var monday = JSON.parse("#{views_participation_dow['Monday']}");
-  var tuesday = JSON.parse("#{views_participation_dow['Tuesday']}");
-  var wednesday = JSON.parse("#{views_participation_dow['Wednesday']}");
-  var thursday = JSON.parse("#{views_participation_dow['Thursday']}");
-  var friday = JSON.parse("#{views_participation_dow['Friday']}");
-  var saturday = JSON.parse("#{views_participation_dow['Saturday']}");
   var dow = JSON.parse("#{views_by_day.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
   var views_by_day = JSON.parse("#{views_by_day.values}");
   var participations_by_day = JSON.parse("#{participations_by_day.values}");

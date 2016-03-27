@@ -1,36 +1,15 @@
 include scripts
 script src='//code.highcharts.com/modules/exporting.js'
-- tardiness = {}
-- page_views = {}
-- participations = {}
-- page_part_scatter = {}
-- tardiness[:missing] = {}
-- tardiness[:late] = {}
-- tardiness[:on_time] = {}
-- tardiness[:floating] = {}
-- data.each do |user| \
-    tardiness[:missing]["user_#{user['id']}"] = user['tardiness_breakdown']['missing']; \
-    tardiness[:late]["user_#{user['id']}"] = user['tardiness_breakdown']['late']; \
-    tardiness[:on_time]["user_#{user['id']}"] = user['tardiness_breakdown']['on_time']; \
-    tardiness[:floating]["user_#{user['id']}"] = user['tardiness_breakdown']['floating']; \
-    page_views["user_#{user['id']}"] = user['page_views']; \
-    participations["user_#{user['id']}"] = user['participations']; \
-    page_part_scatter["user_#{user['id']}"] = [user['page_views'], user['participations']] \
-  end
+
+- tard = data['tard']
+- summaries_height = data['summaries_height']
+- views_pars = data['views_pars']
+- views_pars_height = data['views_pars_height']
+
 h3 Student Lateness
-- tard = [{ name: 'Late Submissions', data: tardiness[:late].sort_by { |user, value| value }.reverse.to_h }, \
-          { name: 'Missing Submissions', data: tardiness[:missing] }, \
-          { name: 'Floating', data: tardiness[:floating] }, \
-          { name: 'On Time Submissions', data: tardiness[:on_time] }]
-- summaries_height = [tardiness[:late].length, tardiness[:missing].length, tardiness[:floating].length, tardiness[:on_time].length].max * 30
+
 == bar_chart tard, stacked: true, height: "#{summaries_height}px", colors: ['#ED4337', '#434348', '#90ed7d', '#7cb5ec']
-- pages_height = page_views.length * 30
-- participations_height = participations.length * 30
-- views_pars_height = [page_views.length, participations.length].max * 30
-- views_pars = [{name: 'Views', data: page_views}, {name: 'Participations', data: participations}]
-- views_pars.each do |view_par| \
-    view_par[:data] = Hash[view_par[:data].sort_by { |u, c| c }.reverse]; \
-  end
+
 div align='center'
   input type='radio' class='part_view' name='part-view' value='stacked' Stacked
   input type='radio' class='part_view' name='part-view' value='discrete' Discrete
