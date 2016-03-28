@@ -7,16 +7,29 @@ script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'
 - views_by_day = activities['views_by_day']
 - participations_by_day = activities['participations_by_day']
 - v_p = activities['v_p']
+javascript:
+  var dow = JSON.parse("#{views_by_day.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
+  var views_by_day = JSON.parse("#{views_by_day.values}");
+  var participations_by_day = JSON.parse("#{participations_by_day.values}");
+
+script src='/activity.js'
 
 / Assignments
-- tard = assignments['tard']
-- scores = assignments['scores']
-- scores_percent = assignments['scores_percent']
+- unless assignments.values[0] == 'No assignment found'
+  - tard = assignments['tard']
+  - scores = assignments['scores']
+  - scores_percent = assignments['scores_percent']
+
+  javascript:
+    var cat = JSON.parse("#{scores.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
+    var values = JSON.parse("#{scores.values}");
+    var cat_percent = JSON.parse("#{scores_percent.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
+    var values_percent = JSON.parse("#{scores_percent.values}");
+
+  script src='/assignments.js'
 
 / Dicussions
-- if discussions_list.values[0] == 'No discussion available'
-  - discussions_has_content = false
-- else
+- unless discussions_list.values[0] == 'No discussion available'
   - discussions_has_content = true
   - discussions = discussions_list['discussions']
   - discussions_id = discussions_list['discussions_id']
@@ -48,29 +61,30 @@ div class='row'
         == line_chart v_p, discrete: true
   div class='col-md-1'
 
-div class='row'
-  h2 align='center' Assignments
-  div class='col-md-1'
-  div class='col-md-5'
-    / h4 Information about lateness
-    == column_chart tard, stacked: true, colors: ['#ED4337', '#434348', '#90ed7d']
+- unless assignments.values[0] == 'No assignment found'
+  div class='row'
+    h2 align='center' Assignments
+    div class='col-md-1'
+    div class='col-md-5'
+      / h4 Information about lateness
+      == column_chart tard, stacked: true, colors: ['#ED4337', '#434348', '#90ed7d']
 
-  div class='col-md-5'
-    ul class='nav nav-tabs'
-      li class='active'
-        a data-toggle='tab' href='#normalAssignment' Regular
-      li
-        a data-toggle='tab' href='#flippedAssignment' Flipped
+    div class='col-md-5'
+      ul class='nav nav-tabs'
+        li class='active'
+          a data-toggle='tab' href='#normalAssignment' Regular
+        li
+          a data-toggle='tab' href='#flippedAssignment' Flipped
 
-    div class='tab-content'
-      div id='normalAssignment' class='tab-pane fade in active'
-        div id='assignment-box-percent'
+      div class='tab-content'
+        div id='normalAssignment' class='tab-pane fade in active'
+          div id='assignment-box-percent'
 
-      div id='flippedAssignment' class='tab-pane fade'
-        div id='assignment-box-flipped'
-  div class='col-md-1'
+        div id='flippedAssignment' class='tab-pane fade'
+          div id='assignment-box-flipped'
+    div class='col-md-1'
 
-- if discussions_has_content
+- unless discussions_list.values[0] == 'No discussion available'
   div class='row'
     h2 align='center' Discussions
     div class='col-md-1'
@@ -107,139 +121,3 @@ div class='row'
         / h4 Page Views & Participations by Student
         == bar_chart views_pars, discrete: true, height: "#{views_pars_height * 1.5}px"
   div class='col-md-1'
-
-javascript:
-  var cat = JSON.parse("#{scores.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
-  var values = JSON.parse("#{scores.values}");
-  var cat_percent = JSON.parse("#{scores_percent.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
-  var values_percent = JSON.parse("#{scores_percent.values}");
-  var dow = JSON.parse("#{views_by_day.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
-  var views_by_day = JSON.parse("#{views_by_day.values}");
-  var participations_by_day = JSON.parse("#{participations_by_day.values}");
-  $(function () {
-    $('#views-by-day').highcharts({
-        title: {
-            text: 'Views & Participation by Day of Week',
-            x: -20 //center
-        },
-        subtitle: {
-            text: 'Aggregate Course Level Data',
-            x: -20
-        },
-        xAxis: {
-            categories: dow
-        },
-        yAxis: {
-            title: {
-                text: 'Views & Participation'
-            },
-            plotLines: [{
-                value: 0,
-                width: 1,
-                color: '#808080'
-            }]
-        },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-        },
-        series: [{
-            name: 'Views',
-            data: views_by_day
-        }, {
-            name: 'Participations',
-            data: participations_by_day
-        }]
-    });
-    $('#assignment-box-flipped').highcharts({
-        chart: {
-            type: 'boxplot',
-            inverted: true
-        },
-        title: {
-            text: 'Assignment Scores (%)'
-        },
-        legend: {
-            enabled: false
-        },
-        xAxis: {
-            categories: cat_percent,
-            title: {
-                text: 'Assignments'
-            }
-        },
-        yAxis: {
-            min: -10,
-            max: 110,
-            title: {
-                text: 'Percent Scores'
-            },
-        },
-        series: [{
-            name: 'Observations',
-            data: values_percent,
-            tooltip: {
-                headerFormat: '<em>Assignment: {point.key}</em><br/>'
-            }
-        }, {
-            name: 'Outlier',
-            color: Highcharts.getOptions().colors[0],
-            type: 'scatter',
-            data: [],
-            marker: {
-                fillColor: 'white',
-                lineWidth: 1,
-                lineColor: Highcharts.getOptions().colors[0]
-            },
-            tooltip: {
-                pointFormat: 'Observation: {point.y}'
-            }
-        }]
-    });
-    $('#assignment-box-percent').highcharts({
-        chart: {
-            type: 'boxplot'
-        },
-        title: {
-            text: 'Assignment Scores (%)'
-        },
-        legend: {
-            enabled: false
-        },
-        xAxis: {
-            categories: cat_percent,
-            title: {
-                text: 'Assignments'
-            }
-        },
-        yAxis: {
-            min: 0,
-            max: 100,
-            title: {
-                text: 'Percent Scores'
-            }
-        },
-        series: [{
-            name: 'Observations',
-            data: values_percent,
-            tooltip: {
-                headerFormat: '<em>Assignment: {point.key}</em><br/>'
-            }
-        }, {
-            name: 'Outlier',
-            color: Highcharts.getOptions().colors[0],
-            type: 'scatter',
-            data: [],
-            marker: {
-                fillColor: 'white',
-                lineWidth: 1,
-                lineColor: Highcharts.getOptions().colors[0]
-            },
-            tooltip: {
-                pointFormat: 'Observation: {point.y}'
-            }
-        }]
-    });
-  });
