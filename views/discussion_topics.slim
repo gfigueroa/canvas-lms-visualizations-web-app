@@ -4,9 +4,9 @@ script src='//code.highcharts.com/modules/exporting.js'
   br No discussions available
 - else
   - discussions = data['discussions']
-  - discussions_id = data['discussions_id']
+  - discussions_by_id = data['discussions_by_id']
   - discussion_height = data['discussion_height']
   h3 Discussions over time
   == column_chart discussions
   h3 Dicussions by Participant
-  == bar_chart discussions_id, height: "#{discussion_height}px"
+  == bar_chart discussions_by_id, height: "#{discussion_height}px"

@@ -5,7 +5,7 @@ script src='//code.highcharts.com/modules/exporting.js'
 h2 Course Participation
 - views_by_day = data['views_by_day']
 - participations_by_day = data['participations_by_day']
-- v_p = data['v_p']
+- views_participations_by_date = data['views_participations_by_date']
 div id='views-by-day'
 
 div align='center'
@@ -13,10 +13,10 @@ div align='center'
   input type='radio' class='part_view' name='part-view' value='discrete' Discrete
 div id='column-chart-stacked'
   h3 Participations & Views (Stacked)
-  == line_chart v_p, stacked: true
+  == line_chart views_participations_by_date, stacked: true
 div id='column-chart-discrete'
   h3 Participations & Views (Discrete)
-  == line_chart v_p, discrete: true
+  == line_chart views_participations_by_date, discrete: true
 
 javascript:
   var dow = JSON.parse("#{views_by_day.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
