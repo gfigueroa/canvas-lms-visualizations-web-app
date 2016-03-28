@@ -6,7 +6,7 @@ script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'
 / Activity
 - views_by_day = activities['views_by_day']
 - participations_by_day = activities['participations_by_day']
-- v_p = activities['v_p']
+- views_participations_by_date = activities['views_participations_by_date']
 javascript:
   var dow = JSON.parse("#{views_by_day.keys}".replace(/&quot;/g, '"').replace(/amp;/g, ''));
   var views_by_day = JSON.parse("#{views_by_day.values}");
@@ -32,7 +32,7 @@ script src='/activity.js'
 - unless discussions_list.values[0] == 'No discussion available'
   - discussions_has_content = true
   - discussions = discussions_list['discussions']
-  - discussions_id = discussions_list['discussions_id']
+  - discussions_by_id = discussions_list['discussions_by_id']
   - discussion_height = discussions_list['discussion_height']
 
 / Student Summaries
@@ -55,10 +55,10 @@ div class='row'
 
     div class='tab-content'
       div id='stackedActivity' class='tab-pane fade in active'
-        == line_chart v_p, stacked: true
+        == line_chart views_participations_by_date, stacked: true
 
       div id='discreteActivity' class='tab-pane fade'
-        == line_chart v_p, discrete: true
+        == line_chart views_participations_by_date, discrete: true
   div class='col-md-1'
 
 - unless assignments.values[0] == 'No assignment found'
@@ -94,7 +94,7 @@ div class='row'
 
     div class='col-md-5'
       / h4 Dicussions by Participant
-      == bar_chart discussions_id, height: "#{discussion_height}px"
+      == bar_chart discussions_by_id, height: "#{discussion_height}px"
 
     div class='col-md-1'
 
