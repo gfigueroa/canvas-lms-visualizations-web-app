@@ -1,17 +1,27 @@
 - if tokens
+  - count = 0
   table cellpadding='10'
     tr
       th List of current tokens (obfuscated)
       th Web Site
+      th API Payload (For developers)
       th Delete Tokens
     - tokens.each do |token|
+      - count += 1
       tr
       form action="/tokens/#{token[2]}" method='post'
         td
           a href="tokens/#{token[2]}" title='To access analytics' #{token[0]}
         td #{token[1]}
+        td
+          a href="#" onclick="toggler(#{count})" Click to view
+          br
+          textarea id="text-area-#{count}" style='display:none' rows='7' cols='50'
+            | #{token[3]}
         td align='center'
           input type='submit' name='_method' value='delete'
+
+  script src='/payload_textarea.js'
 
 h3 Add new token
 form action='/tokens' method='post'

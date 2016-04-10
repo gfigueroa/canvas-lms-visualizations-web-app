@@ -21,7 +21,7 @@ end
 
 # Visualizations for Canvas LMS Classes
 class CanvasVisualizationApp < Sinatra::Base
-  include AppLoginHelper, AppTokenHelper
+  include AppLoginHelper
   enable :logging
   use Rack::MethodOverride
 
@@ -33,14 +33,14 @@ class CanvasVisualizationApp < Sinatra::Base
 
   configure :development, :test do
     set :root, 'http://localhost:9393'
-    set :api_root, 'http://localhost:9292'
+    set :api_root, 'http://localhost:9292/api/v1'
   end
 
   configure :production do
     use Rack::SslEnforcer
     set :session_secret, ENV['MSG_KEY']
     set :root, 'https://canvas-viz-app.herokuapp.com'
-    set :api_root, 'https://canvas-viz-api.herokuapp.com'
+    set :api_root, 'https://canvas-viz-api.herokuapp.com/api/v1'
   end
 
   configure do
@@ -112,7 +112,7 @@ class CanvasVisualizationApp < Sinatra::Base
     create_password_form = CreatePasswordForm.new(params)
     if create_password_form.valid?
       session[:unleash_token] = SaveTeacherPassword.new(
-        @current_teacher.email, params['password']
+        settings.api_root, @current_teacher.email, params['password']
       ).call
       redirect '/tokens'
     else
@@ -122,14 +122,27 @@ class CanvasVisualizationApp < Sinatra::Base
   end
 
   get '/tokens/?', auth: [:teacher, :token_set] do
-    tokens = ListTokens.new(@current_teacher, @token_set).call
+    payload = { email: @current_teacher.email, token_set: @token_set }.to_json
+    payload = EncryptPayload.new(payload).call
+    url = "#{settings.api_root}/tokens"
+    headers = { 'AUTHORIZATION' => "Bearer #{payload}" }
+    tokens = HTTParty.get(url, headers: headers)
+    tokens = CreatePayloadForDevs.new(
+      tokens, @current_teacher.email, @token_set
+    ).call
     slim :tokens, locals: { tokens: tokens }
   end
 
   post '/tokens/?', auth: [:teacher, :token_set] do
     save_token_form = SaveTokenForm.new(params)
     if save_token_form.valid?
-      result = SaveToken.new(@current_teacher, @token_set, params).call
+      payload = {
+        email: @current_teacher.email, token_set: @token_set, params: params
+      }.to_json
+      payload = EncryptPayload.new(payload).call
+      url = "#{settings.api_root}/tokens"
+      headers = { 'AUTHORIZATION' => "Bearer #{payload}" }
+      result = HTTParty.post(url, headers: headers)
       if result.include?('saved')
         flash[:notice] = "#{result}"
       else flash[:error] = "#{result}"
@@ -141,36 +154,47 @@ class CanvasVisualizationApp < Sinatra::Base
   end
 
   get '/tokens/:access_key/?', auth: [:teacher, :token_set] do
-    token = you_shall_not_pass!(params['access_key'])
-    payload = EncryptToken.new(token.canvas_token(@token_set)).call
+    payload = {
+      email: @current_teacher.email, access_key: params['access_key'],
+      token_set: @token_set
+    }.to_json
+    payload = EncryptPayload.new(payload).call
     url = "#{settings.api_root}/courses"
-    body = { 'url' => "#{token.canvas_api(@token_set)}" }
     headers = { 'AUTHORIZATION' => "Bearer #{payload}" }
-    courses = HTTParty.get(url, body: body, headers: headers)
+    courses = HTTParty.get(url, headers: headers).body
     slim :courses, locals: { courses: JSON.parse(courses),
                              token: params['access_key'] }
   end
 
   delete '/tokens/:access_key/?', auth: [:teacher, :token_set] do
-    token = you_shall_not_pass!(params['access_key'])
-    if DeleteToken.new(token).call
+    payload = {
+      email: @current_teacher.email, access_key: params['access_key']
+    }.to_json
+    payload = EncryptPayload.new(payload).call
+    url = "#{settings.api_root}/token"
+    headers = { 'AUTHORIZATION' => "Bearer #{payload}" }
+    result = HTTParty.delete(url, headers: headers).code
+    if result == 200
       flash[:notice] = 'Successfully deleted!'
-    else
-      flash[:error] = 'This is a strange one'
+    elsif result == 401
+      flash[:error] = 'You do not own this token!'
+    else flash[:error] = 'This is a strange one :('
     end
     redirect '/tokens'
   end
 
   get '/tokens/:access_key/:course_id/dashboard/?',
       auth: [:teacher, :token_set] do
-    token = you_shall_not_pass!(params['access_key'])
-    payload = EncryptToken.new(token.canvas_token(@token_set)).call
+    payload = {
+      email: @current_teacher.email, access_key: params['access_key'],
+      token_set: @token_set
+    }.to_json
+    payload = EncryptPayload.new(payload).call
     url = "#{settings.api_root}/courses/#{params['course_id']}/"
-    body = { 'url' => "#{token.canvas_api(@token_set)}" }
     headers = { 'AUTHORIZATION' => "Bearer #{payload}" }
     activity, assignments, discussion_topics, student_summaries =
     %w(activity assignments discussion_topics student_summaries).map do |link|
-      HTTParty.get("#{url}#{link}", body: body, headers: headers)
+      HTTParty.get("#{url}#{link}", headers: headers)
     end
     slim :dashboard, locals: {
       activities: JSON.parse(activity, quirks_mode: true),
@@ -182,13 +206,15 @@ class CanvasVisualizationApp < Sinatra::Base
 
   get '/tokens/:access_key/:course_id/:data/?',
       auth: [:teacher, :token_set] do
-    token = you_shall_not_pass!(params['access_key'])
-    payload = EncryptToken.new(token.canvas_token(@token_set)).call
+    payload = {
+      email: @current_teacher.email, access_key: params['access_key'],
+      token_set: @token_set
+    }.to_json
+    payload = EncryptPayload.new(payload).call
     url = "#{settings.api_root}/courses/"\
       "#{params['course_id']}/#{params['data']}"
-    body = { 'url' => "#{token.canvas_api(@token_set)}" }
     headers = { 'AUTHORIZATION' => "Bearer #{payload}" }
-    result = HTTParty.get(url, body: body, headers: headers)
+    result = HTTParty.get(url, headers: headers)
     slim :"#{params['data']}",
          locals: { data: JSON.parse(result, quirks_mode: true) }
   end
