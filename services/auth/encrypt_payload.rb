@@ -2,8 +2,8 @@ require 'json'
 require 'base64'
 require 'rbnacl/libsodium'
 
-# Service object to encrypt tokens as a service.
-class EncryptToken
+# Service object to encrypt payloads meant for the API.
+class EncryptPayload
   attr_accessor :token
 
   def initialize(token)

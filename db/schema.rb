@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151012075057) do
+ActiveRecord::Schema.define(version: 20151012074753) do
 
   create_table "teachers", force: :cascade do |t|
     t.text     "email"
@@ -20,16 +20,6 @@ ActiveRecord::Schema.define(version: 20151012075057) do
     t.text     "token_salt"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
-  end
-
-  create_table "tokens", force: :cascade do |t|
-    t.text     "email"
-    t.text     "encrypted_url"
-    t.text     "encrypted_token"
-    t.text     "encrypted_nonce"
-    t.text     "encrypted_access_key"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
   end
 
 end
