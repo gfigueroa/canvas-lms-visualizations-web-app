@@ -100,6 +100,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activemodel
   activerecord
   awesome_print
   chartkick

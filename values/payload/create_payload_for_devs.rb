@@ -8,8 +8,8 @@ class CreatePayloadForDevs
 
   def call
     @tokens.each do |token|
-      payload = { email: @email, token_set: @token_set, access_key: token[2] }
-      payload = EncryptPayload.new(payload.to_json).call
+      payload = AccessKeyTokenSetPayload.new(
+        @email, token[2], @token_set).payload
       token << payload
     end
     @tokens
