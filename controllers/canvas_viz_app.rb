@@ -32,7 +32,7 @@ class CanvasVisualizationApp < Sinatra::Base
   set :public_folder, File.expand_path('../../public', __FILE__)
 
   configure :development, :test do
-    set :api_root, 'http://localhost:9292/api/v1'
+    set :api_root, 'http://canvas-lms-visualizations-api-gfigueroa.c9users.io:9292/api/v1'
   end
 
   configure :production do
